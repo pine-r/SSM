@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace命名空间，作用就是对sql进行分类化管理； 注意：使用mapper代理方法开发时，namespace指向同名的mapper接口类 -->
+<mapper namespace="com.ssm.demo.mapper.UserManagerMapper">
+
+	<resultMap type="User" id="userResultMap">
+		<id column="id" property="id" />
+		<result column="account" property="account" />
+		<association property="userDetaile" javaType="UserDetaile">
+			<id column="userid" property="userid" />
+			<result column="username" property="username" />
+			<result column="sex" property="sex" />
+			<result column="address" property="address" />
+			<result column="birthday" property="birthday" />
+			<result column="head_img" property="head_img" />
+		</association>
+	</resultMap>
+
+	<sql id="where1">
+		<where>
+			a.id = b.userid
+			<if test="user.id!=null and user.id!=''">and a.id = #{user.id}</if>
+			<if test="user.account!=null and user.account!=''">and a.account = #{user.account}</if>
+			<if test="user.userDetaile!=null">
+				<if test="user.userDetaile.username!=null and user.userDetaile.username!=''">and b.username like '%${user.userDetaile.username}%'</if>
+				<if test="user.userDetaile.sex!=null and user.userDetaile.sex!=''">and b.sex = #{user.userDetaile.sex}</if>
+				<if test="user.userDetaile.address!=null and user.userDetaile.address!=''">and b.address like '%${user.userDetaile.address}</if>
+				<if test="user.userDetaile.birthday!=null">and b.birthday = #{user.userDetaile.birthday}</if>
+			</if>			 
+		</where>
+	</sql>
+
+	<!-- 根据id查询用户 -->
+	<select id="findUserById" parameterType="int" resultMap="userResultMap">
+		select *
+		from user a,userdetaile b WHERE a.id = b.userid and a.id=#{value}
+	</select>
+
+	<!-- 根据帐号和密码查询用户 -->
+	<select id="findUserByLogin" resultMap="userResultMap">
+		select * from user
+		a,userdetaile b WHERE a.id = b.userid
+		and a.account = #{account} and a.password = #{password}
+	</select>
+
+	<!-- 根据输入条件查询用户 -->
+	<select id="queryUser" resultMap="userResultMap">
+		select * from user a,userdetaile b
+		<include refid="where1"/>
+		order by a.id asc limit #{startrow},#{length} 
+	</select>
+	
+	<!-- 根据输入条件查询用户总数 -->
+	<select id="queryUserCount" resultType="int">
+		select count(*) from user a,userdetaile b
+		<include refid="where1"/>
+	</select>
+
+	<!-- 增加用户（注册） -->
+	<insert id="insertUser" parameterType="User">
+		<selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into user (account,password) value (#{account},#{password});
+	</insert>
+
+	<!-- 删除用户 -->
+	<delete id="deleteUser" parameterType="java.lang.Integer">
+		delete from user where
+		id=#{value};
+	</delete>
+
+	<!-- 修改用户信息 -->
+	<update id="updateUser" parameterType="User">
+		update user set
+		password=#{password} where id=#{id};
+	</update>
+
+
+</mapper>
+
+

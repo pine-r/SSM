@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace命名空间，作用就是对sql进行分类化管理； 
+注意：使用mapper代理方法开发时，namespace指向同名的mapper接口类 -->
+<mapper namespace="com.ssm.demo.mapper.UserDetailMapper">
+
+
+	<!-- 增加用户（注册） -->
+	<insert id="insertUserDetail" parameterType="UserDetaile">
+		insert into userdetaile (userid,username,sex,address,birthday,head_img) 
+			values (#{userid},#{username},#{sex},#{address},#{birthday},#{head_img});
+	</insert>
+	
+	<!-- 删除用户  -->
+	<delete id="deleteUserDetail" parameterType="java.lang.Integer">
+		delete from userdetaile where userid=#{value};
+	</delete>
+	
+	<!-- 修改用户信息 -->
+	<update id="updateUserDetail" parameterType="UserDetaile">
+		update userdetaile 
+		set username = #{username},
+			sex = #{sex},
+			address = #{address},
+			birthday = #{birthday},
+			head_img = #{head_img}
+		where userid=#{userid}
+	</update>
+	
+</mapper>
+
+
